@@ -1,8 +1,24 @@
 #include "main.h"
 
 /**
+ * print_number - prints a number
+ * @num: number to print
+ */
+void print_number(int num)
+{
+	if (num >= 100)
+	{
+		_putchar((num / 100) + '0');
+		_putchar(((num / 10) % 10) + '0');
+	}
+	if (num >= 10)
+		_putchar(((num / 10) % 10) + '0');
+	_putchar((num % 10) + '0');
+}
+
+/**
  * print_times_table - prints the n times table
- * @n: size of table
+ * @n: size of the times table
  */
 void print_times_table(int n)
 {
@@ -16,42 +32,19 @@ void print_times_table(int n)
 		for (j = 0; j <= n; j++)
 		{
 			num = i * j;
-
-			if (j == 0)
-			{
-				_putchar('0');
-			}
-			else
+			if (j != 0)
 			{
 				_putchar(',');
 				_putchar(' ');
-
 				if (num < 10)
 				{
 					_putchar(' ');
 					_putchar(' ');
 				}
 				else if (num < 100)
-				{
 					_putchar(' ');
-				}
-
-				if (num >= 100)
-				{
-					_putchar((num / 100) + '0');
-					_putchar(((num / 10) % 10) + '0');
-					_putchar((num % 10) + '0');
-				}
-				else if (num >= 10)
-				{
-					_putchar((num / 10) + '0');
-					_putchar((num % 10) + '0');
-				}
-				else
-				{
-					_putchar(num + '0');
-				}
 			}
+			print_number(num);
 		}
 		_putchar('\n');
 	}
