@@ -36,6 +36,7 @@ int main(void)
 
       result = a + b;
 
+      printf("Result: %d\n", result);
     }
     else if (choice == 2)
     {
@@ -45,8 +46,9 @@ int main(void)
       printf("B: ");
       scanf("%d", &b);
 
-      result = a -b ;
+      result = a - b ;
 
+      printf("Result: %d\n", result);
     }
     else if (choice == 3)
     {
@@ -58,9 +60,25 @@ int main(void)
 
       result = a * b ;
 
+      printf("Result: %d\n", result);
     }
-    printf("Result: %d\n", result);
-  }
+    else if (choice == 4)
+    {
+      printf("A: ");
+      scanf("%d", &a);
 
+      printf("B: ");
+      scanf("%d", &b);
+
+      if (b == 0)
+      {
+        printf("Error: division by zero\n");
+      }
+      else
+      {
+        printf("result %.1f\n", (double)a / b);
+      }
+    }
+  }
 	return (0);
 }
