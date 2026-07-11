@@ -18,8 +18,14 @@ int main(void)
 		scanf("%d", &choice);
 		
 		if (choice ==0)
+    {
 			printf("Bye!\n");
-	}
+	  }
+    else if (choice < 0 || choice > 4)
+    {
+      printf("Invalid choice\n");
+    }
+  }
 
 	return (0);
 }

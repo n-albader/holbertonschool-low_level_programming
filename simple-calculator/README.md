@@ -12,6 +12,7 @@ gcc -Wall -Werror -Wextra -pedantic -std=gnu89 calculator.c -o calculator
 
 - Display the menu
 - Quit using option 0
+- Validate menu choices
 
 ## Numeric Behavior
 
