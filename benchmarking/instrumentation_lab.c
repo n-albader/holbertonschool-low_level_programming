@@ -52,7 +52,6 @@ static unsigned long reduce_checksum(void)
 
 int main(void)
 {
-   // unsigned long checksum;
 
     /* Students must add clock-based timing and print required lines. */
     
@@ -86,9 +85,6 @@ int main(void)
     total_end = clock();
     total_time = (double) (total_end - total_start) / CLOCKS_PER_SEC;
 
-    //build_dataset();
-    //process_dataset();
-    //checksum = reduce_checksum();
 
     if (checksum == 0ul)
         printf("impossible\n");
