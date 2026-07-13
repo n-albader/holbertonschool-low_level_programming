@@ -17,15 +17,17 @@ gcc -Wall -Werror -Wextra -pedantic -std=gnu89 calculator.c -o calculator
 - Subtraction
 - Multiplication
 - Division
+- Recovery from invalid (non-numeric) input
 
 ## Numeric Behavior
 
 - The program reads integer input using 'scanf'
 - Addition, subtraction, and multiplication use integers
 - Division returns a decimal result
+- Invalid menu choices are rejected
+- Non-numeric input is detected and the user is prompted again
 
 ## Known Limitations
 
 - Only integer input is supported
-- Non-numeric input is not handled
 - Division by zero prints an error message
