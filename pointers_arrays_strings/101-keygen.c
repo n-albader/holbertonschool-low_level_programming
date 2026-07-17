@@ -6,7 +6,7 @@
 int main(void)
 {
   int length = 42;
-	char key[length + 1];
+	char key[42 + 1];
 	int i;
 	int a, b;
 
