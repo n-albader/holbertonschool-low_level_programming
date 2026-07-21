@@ -18,32 +18,68 @@ static int count_words(char *str)
 	{
 		while (str[i] == ' ')
 			i++;
-
 		if (str[i] != '\0')
 		{
 			words++;
-
 			while (str[i] != '\0' && str[i] != ' ')
 				i++;
 		}
 	}
-
 	return (words);
 }
 
 /**
  * free_words - frees allocated memory
  * @words: array of words
- * @n: number of allocated words
+ * @count: number of allocated words
  *
  * Return: Nothing
  */
-static void free_words(char **words, int n)
+static void free_words(char **words, int count)
 {
-	while (n--)
-		free(words[n]);
-
+	while (count--)
+		free(words[count]);
 	free(words);
+}
+
+/**
+ * fill_words - fills the array with words
+ * @words: array of words
+ * @str: input string
+ * @count: number of words
+ *
+ * Return: 1 on success, 0 on failure
+ */
+static int fill_words(char **words, char *str, int count)
+{
+	int i, j, k, start, len;
+
+	i = 0;
+	k = 0;
+	while (k < count)
+	{
+		while (str[i] == ' ')
+			i++;
+		start = i;
+		len = 0;
+		while (str[i] != '\0' && str[i] != ' ')
+		{
+			len++;
+			i++;
+		}
+		words[k] = malloc(sizeof(char) * (len + 1));
+		if (words[k] == NULL)
+		{
+			free_words(words, k);
+			return (0);
+		}
+		for (j = 0; j < len; j++)
+			words[k][j] = str[start + j];
+		words[k][j] = '\0';
+		k++;
+	}
+	words[k] = NULL;
+	return (1);
 }
 
 /**
@@ -55,7 +91,7 @@ static void free_words(char **words, int n)
 char **strtow(char *str)
 {
 	char **words;
-	int i, j, k, start, len, count;
+	int count;
 
 	if (str == NULL || *str == '\0')
 		return (NULL);
@@ -68,38 +104,8 @@ char **strtow(char *str)
 	if (words == NULL)
 		return (NULL);
 
-	i = 0;
-	k = 0;
-
-	while (k < count)
-	{
-		while (str[i] == ' ')
-			i++;
-
-		start = i;
-		len = 0;
-
-		while (str[i] != '\0' && str[i] != ' ')
-		{
-			len++;
-			i++;
-		}
-
-		words[k] = malloc(sizeof(char) * (len + 1));
-		if (words[k] == NULL)
-		{
-			free_words(words, k);
-			return (NULL);
-		}
-
-		for (j = 0; j < len; j++)
-			words[k][j] = str[start + j];
-
-		words[k][j] = '\0';
-		k++;
-	}
-
-	words[k] = NULL;
+	if (fill_words(words, str, count) == 0)
+		return (NULL);
 
 	return (words);
 }
