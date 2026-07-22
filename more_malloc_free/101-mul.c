@@ -43,17 +43,19 @@ int is_digit(char *s)
  *
  * Return: Length
  */
+
 int _strlen(char *s)
 {
-  int len;
+	int len;
 
-	int len = 0;
+	len = 0;
 
 	while (s[len] != '\0')
 		len++;
 
 	return (len);
 }
+
 /**
  * init_result - Initializes result array
  * @result: Result array
@@ -76,8 +78,9 @@ void init_result(int *result, int len)
 void multiply(char *a, char *b, int *result)
 {
 
-	int len1, len2, len, i, j
+	int len1, len2, len, i, j;
   int carry, n1, n2;
+  int sum;
 
 	len1 = _strlen(a);
 	len2 = _strlen(b);
@@ -96,7 +99,7 @@ void multiply(char *a, char *b, int *result)
 			carry = sum / 10;
 		}
 
-		result[i + j + 1] += carry;
+		result[i] += carry;
 	}
 }
 /**
@@ -134,7 +137,7 @@ void print_result(int *result, int len)
  * Return: 0
  */
 int main(int argc, char *argv[])
-
+{
   int len;
   int *result;
 
@@ -151,7 +154,9 @@ int main(int argc, char *argv[])
 		print_error();
 
   init_result(result, len);
-  multiply(argv[1], argv[2], len);
+  multiply(argv[1], argv[2], result);
+
+  print_result(result, len);
 
 	free(result);
 
