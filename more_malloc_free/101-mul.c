@@ -125,13 +125,14 @@ int main(int argc, char *argv[])
 
 	result = malloc(sizeof(int) * len);
 	if (!result)
-		return (1);
+		_errors(1);
 
 	for (i = 0; i < len; i++)
 		result[i] = 0;
 
 	multiply(s1, s2, result, len1, len2);
 	print_result(result, len);
+
 	free(result);
 
 	return (0);
