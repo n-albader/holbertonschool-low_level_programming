@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 
 	result = malloc(sizeof(int) * len);
 	if (!result)
-		_errors(1);
+		_errors();
 
 	for (i = 0; i < len; i++)
 		result[i] = 0;
