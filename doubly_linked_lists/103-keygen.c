@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 /**
  * main - generates a key for crackme5
@@ -13,35 +12,40 @@ int main(int argc, char **argv)
 {
 	char *charset;
 	char key[7];
-	int len, sum, product, max;
-	int i;
-	int r;
+	int len, i, sum, product, max;
+	int value;
 
 	charset = "A-CHRDw8H7lNS0E9BH2TibgpnMHVys5XzvtHOGJcYLU+H4mjW6fxqHZeF3Qa1rHPhdKIoukH";
 
 	if (argc != 2)
 		return (1);
 
-	len = strlen(argv[1]);
+	/* Get username length */
+	len = 0;
+	while (argv[1][len] != '\0')
+		len++;
 
 	/* First character */
-	key[0] = charset[(len ^ 0x3B) & 0x3F];
+	value = (len ^ 0x3B) & 0x3F;
+	key[0] = charset[value];
 
-	/* Second character: sum of username characters */
+	/* Second character: sum of all characters */
 	sum = 0;
 	for (i = 0; i < len; i++)
 		sum += argv[1][i];
 
-	key[1] = charset[(sum ^ 0x4F) & 0x3F];
+	value = (sum ^ 0x4F) & 0x3F;
+	key[1] = charset[value];
 
-	/* Third character: product of username characters */
+	/* Third character: product of all characters */
 	product = 1;
 	for (i = 0; i < len; i++)
 		product *= argv[1][i];
 
-	key[2] = charset[(product ^ 0x55) & 0x3F];
+	value = (product ^ 0x55) & 0x3F;
+	key[2] = charset[value];
 
-	/* Fourth character: random value based on largest character */
+	/* Fourth character: largest character */
 	max = argv[1][0];
 	for (i = 0; i < len; i++)
 	{
@@ -50,26 +54,32 @@ int main(int argc, char **argv)
 	}
 
 	srand(max ^ 0x0E);
-	r = rand();
-	key[3] = charset[r & 0x3F];
+	value = rand() & 0x3F;
+	key[3] = charset[value];
 
 	/* Fifth character: sum of squares */
 	sum = 0;
 	for (i = 0; i < len; i++)
 		sum += argv[1][i] * argv[1][i];
 
-	key[4] = charset[(sum ^ 0xEF) & 0x3F];
+	value = (sum ^ 0xEF) & 0x3F;
+	key[4] = charset[value];
 
-	/* Sixth character: random value */
-	r = 0;
-	for (i = 0; i < key[0]; i++)
-		r = rand();
+	/*
+	 * Sixth character:
+	 * use the first character of username
+	 * as the number of rand() calls.
+	 */
+	value = 0;
+	for (i = 0; i < argv[1][0]; i++)
+		value = rand();
 
-	key[5] = charset[(r ^ 0xE5) & 0x3F];
+	value = (value ^ 0xE5) & 0x3F;
+	key[5] = charset[value];
 
 	key[6] = '\0';
 
-	printf("%s", key);
+	printf("%s\n", key);
 
 	return (0);
 }
