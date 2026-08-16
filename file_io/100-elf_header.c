@@ -4,11 +4,11 @@
 #include <unistd.h>
 
 /**
- * get16 - gets a 16-bit value
- * @p: pointer to bytes
- * @big: endianness
+ * get16 - gets a 16-bit value from ELF data
+ * @p: pointer to data
+ * @big: endianness flag
  *
- * Return: value
+ * Return: 16-bit value
  */
 unsigned short get16(unsigned char *p, int big)
 {
@@ -19,11 +19,11 @@ unsigned short get16(unsigned char *p, int big)
 }
 
 /**
- * get32 - gets a 32-bit value
- * @p: pointer to bytes
- * @big: endianness
+ * get32 - gets a 32-bit value from ELF data
+ * @p: pointer to data
+ * @big: endianness flag
  *
- * Return: value
+ * Return: 32-bit value
  */
 unsigned long get32(unsigned char *p, int big)
 {
@@ -48,11 +48,11 @@ unsigned long get32(unsigned char *p, int big)
 }
 
 /**
- * get64 - gets a 64-bit value
- * @p: pointer to bytes
- * @big: endianness
+ * get64 - gets a 64-bit value using unsigned long
+ * @p: pointer to data
+ * @big: endianness flag
  *
- * Return: value
+ * Return: 64-bit value
  */
 unsigned long get64(unsigned char *p, int big)
 {
@@ -76,7 +76,7 @@ unsigned long get64(unsigned char *p, int big)
 }
 
 /**
- * print_magic - prints ELF magic
+ * print_magic - prints the ELF magic
  * @header: ELF header
  */
 void print_magic(unsigned char *header)
@@ -86,11 +86,18 @@ void print_magic(unsigned char *header)
 	printf("  Magic:   ");
 
 	for (i = 0; i < 16; i++)
-		printf("%02x%s", header[i], i == 15 ? "\n" : " ");
+	{
+		printf("%02x", header[i]);
+
+		if (i != 15)
+			printf(" ");
+	}
+
+	printf("\n");
 }
 
 /**
- * print_osabi - prints OS/ABI
+ * print_osabi - prints the ELF OS/ABI
  * @abi: OS/ABI value
  */
 void print_osabi(unsigned char abi)
@@ -154,9 +161,9 @@ void print_osabi(unsigned char abi)
 }
 
 /**
- * print_type - prints ELF type
+ * print_type - prints the ELF type
  * @header: ELF header
- * @big: endianness
+ * @big: endianness flag
  */
 void print_type(unsigned char *header, int big)
 {
@@ -164,7 +171,7 @@ void print_type(unsigned char *header, int big)
 
 	type = get16(header + 16, big);
 
-	printf("  Type:                             ");
+	printf("  Type:                              ");
 
 	switch (type)
 	{
@@ -190,16 +197,14 @@ void print_type(unsigned char *header, int big)
 }
 
 /**
- * print_entry - prints entry point
+ * print_entry - prints the ELF entry point
  * @header: ELF header
  * @class: ELF class
- * @big: endianness
+ * @big: endianness flag
  */
 void print_entry(unsigned char *header, unsigned char class, int big)
 {
 	unsigned long entry;
-
-	entry = 0;
 
 	if (class == 1)
 		entry = get32(header + 24, big);
@@ -210,7 +215,7 @@ void print_entry(unsigned char *header, unsigned char class, int big)
 }
 
 /**
- * main - displays ELF header information
+ * main - displays information from an ELF header
  * @argc: number of arguments
  * @argv: arguments
  *
@@ -290,7 +295,8 @@ int main(int argc, char **argv)
 
 	printf("  Version:                           %u %s\n",
 	       header[6],
-	       header[6] == 1 ? "(current)" : "(invalid)");
+	       (header[6] == 1 || header[6] == 2) ?
+	       "(current)" : "(invalid)");
 
 	print_osabi(header[7]);
 
