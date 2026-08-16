@@ -4,26 +4,26 @@
 #include <unistd.h>
 
 /**
- * get16 - gets a 16-bit value from ELF data
- * @p: pointer to data
- * @big: endianness flag
+ * get16 - gets a 16-bit value
+ * @p: pointer to bytes
+ * @big: endianness
  *
- * Return: 16-bit value
+ * Return: value
  */
 unsigned short get16(unsigned char *p, int big)
 {
 	if (big)
-		return ((p[0] << 8) | p[1]);
+		return ((unsigned short)p[0] << 8 | p[1]);
 
-	return ((p[1] << 8) | p[0]);
+	return ((unsigned short)p[1] << 8 | p[0]);
 }
 
 /**
- * get32 - gets a 32-bit value from ELF data
- * @p: pointer to data
- * @big: endianness flag
+ * get32 - gets a 32-bit value
+ * @p: pointer to bytes
+ * @big: endianness
  *
- * Return: 32-bit value
+ * Return: value
  */
 unsigned long get32(unsigned char *p, int big)
 {
@@ -31,16 +31,16 @@ unsigned long get32(unsigned char *p, int big)
 
 	if (big)
 	{
-		value = ((unsigned long)p[0] << 24);
-		value |= ((unsigned long)p[1] << 16);
-		value |= ((unsigned long)p[2] << 8);
+		value = (unsigned long)p[0] << 24;
+		value |= (unsigned long)p[1] << 16;
+		value |= (unsigned long)p[2] << 8;
 		value |= p[3];
 	}
 	else
 	{
-		value = ((unsigned long)p[3] << 24);
-		value |= ((unsigned long)p[2] << 16);
-		value |= ((unsigned long)p[1] << 8);
+		value = (unsigned long)p[3] << 24;
+		value |= (unsigned long)p[2] << 16;
+		value |= (unsigned long)p[1] << 8;
 		value |= p[0];
 	}
 
@@ -48,15 +48,15 @@ unsigned long get32(unsigned char *p, int big)
 }
 
 /**
- * get64 - gets a 64-bit value from ELF data
- * @p: pointer to data
- * @big: endianness flag
+ * get64 - gets a 64-bit value
+ * @p: pointer to bytes
+ * @big: endianness
  *
- * Return: 64-bit value
+ * Return: value
  */
-unsigned long long get64(unsigned char *p, int big)
+unsigned long get64(unsigned char *p, int big)
 {
-	unsigned long long value;
+	unsigned long value;
 	int i;
 
 	value = 0;
@@ -76,12 +76,26 @@ unsigned long long get64(unsigned char *p, int big)
 }
 
 /**
- * print_osabi - prints the ELF OS/ABI
+ * print_magic - prints ELF magic
+ * @header: ELF header
+ */
+void print_magic(unsigned char *header)
+{
+	int i;
+
+	printf("  Magic:   ");
+
+	for (i = 0; i < 16; i++)
+		printf("%02x%s", header[i], i == 15 ? "\n" : " ");
+}
+
+/**
+ * print_osabi - prints OS/ABI
  * @abi: OS/ABI value
  */
 void print_osabi(unsigned char abi)
 {
-	printf("  OS/ABI:\t\t\t\t");
+	printf("  OS/ABI:                            ");
 
 	switch (abi)
 	{
@@ -92,7 +106,7 @@ void print_osabi(unsigned char abi)
 			printf("HP-UX\n");
 			break;
 		case 2:
-			printf("NetBSD\n");
+			printf("UNIX - NetBSD\n");
 			break;
 		case 3:
 			printf("GNU/Linux\n");
@@ -134,26 +148,25 @@ void print_osabi(unsigned char abi)
 			printf("CloudABI\n");
 			break;
 		default:
-			printf("<unknown: %x>\n", abi);
-			return;
+			printf("<unknown: %02x>\n", abi);
+			break;
 	}
-
 }
 
 /**
- * print_type - prints the ELF file type
- * @type: ELF type
- * @big: endianness flag
+ * print_type - prints ELF type
+ * @header: ELF header
+ * @big: endianness
  */
-void print_type(unsigned char *type, int big)
+void print_type(unsigned char *header, int big)
 {
-	unsigned short value;
+	unsigned short type;
 
-	value = get16(type, big);
+	type = get16(header + 16, big);
 
-	printf("  Type:\t\t\t\t\t");
+	printf("  Type:                             ");
 
-	switch (value)
+	switch (type)
 	{
 		case 0:
 			printf("NONE (No file type)\n");
@@ -171,33 +184,29 @@ void print_type(unsigned char *type, int big)
 			printf("CORE (Core file)\n");
 			break;
 		default:
-			printf("<unknown>: %u\n", value);
-		}
+			printf("<unknown>: %u\n", type);
+			break;
+	}
 }
 
 /**
- * print_entry - prints the ELF entry point
- * @data: ELF header
+ * print_entry - prints entry point
+ * @header: ELF header
  * @class: ELF class
- * @big: endianness flag
+ * @big: endianness
  */
-void print_entry(unsigned char *data, unsigned char class, int big)
+void print_entry(unsigned char *header, unsigned char class, int big)
 {
-	unsigned long value32;
-	unsigned long long value64;
+	unsigned long entry;
 
-	printf("  Entry point address:\t\t\t");
+	entry = 0;
 
 	if (class == 1)
-	{
-		value32 = get32(data + 24, big);
-		printf("0x%lx\n", value32);
-	}
+		entry = get32(header + 24, big);
 	else
-	{
-		value64 = get64(data + 24, big);
-		printf("0x%llx\n", value64);
-	}
+		entry = get64(header + 24, big);
+
+	printf("  Entry point address:               0x%lx\n", entry);
 }
 
 /**
@@ -210,12 +219,10 @@ void print_entry(unsigned char *data, unsigned char class, int big)
 int main(int argc, char **argv)
 {
 	int fd;
+	int big;
 	ssize_t bytes;
 	unsigned char header[64];
 	unsigned char class;
-	unsigned char data;
-	unsigned char version;
-	unsigned short type;
 
 	if (argc != 2)
 	{
@@ -251,8 +258,6 @@ int main(int argc, char **argv)
 	}
 
 	class = header[4];
-	data = header[5];
-	version = header[6];
 
 	if (class != 1 && class != 2)
 	{
@@ -262,7 +267,7 @@ int main(int argc, char **argv)
 		return (98);
 	}
 
-	if (data != 1 && data != 2)
+	if (header[5] != 1 && header[5] != 2)
 	{
 		dprintf(STDERR_FILENO,
 			"Error: Invalid ELF data encoding in %s\n", argv[1]);
@@ -270,37 +275,30 @@ int main(int argc, char **argv)
 		return (98);
 	}
 
+	big = (header[5] == 2);
+
 	printf("ELF Header:\n");
 
-	printf("  Magic:\t");
-	{
-		int i;
+	print_magic(header);
 
-		for (i = 0; i < 16; i++)
-			printf("%02x%s", header[i], i == 15 ? "\n" : " ");
-	}
-
-	printf("  Class:\t\t\t\t%s\n",
+	printf("  Class:                             %s\n",
 	       class == 1 ? "ELF32" : "ELF64");
 
-	printf("  Data:\t\t\t\t\t%s\n",
-	       data == 1 ?
-	       "2's complement, little endian" :
-	       "2's complement, big endian");
+	printf("  Data:                              %s\n",
+	       big ? "2's complement, big endian" :
+	       "2's complement, little endian");
 
-	printf("  Version:\t\t\t\t%d %s\n",
-	       version,
-	       version == 1 ? "(current)" : "(invalid)");
+	printf("  Version:                           %u %s\n",
+	       header[6],
+	       header[6] == 1 ? "(current)" : "(invalid)");
 
 	print_osabi(header[7]);
 
-	printf("  ABI Version:\t\t\t\t%u\n", header[8]);
+	printf("  ABI Version:                       %u\n", header[8]);
 
-	type = get16(header + 16, data == 2);
-	(void)type;
+	print_type(header, big);
 
-	print_type(header + 16, data == 2);
-	print_entry(header, class, data == 2);
+	print_entry(header, class, big);
 
 	if (close(fd) == -1)
 	{
